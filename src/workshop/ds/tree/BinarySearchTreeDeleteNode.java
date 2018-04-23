@@ -1,4 +1,4 @@
-package workshop.ds.list;
+package workshop.ds.tree;
 
 public class BinarySearchTreeDeleteNode {
 
