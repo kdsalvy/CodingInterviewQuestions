@@ -10,79 +10,73 @@ public class ThreeThreadSynchronization {
     volatile boolean t3 = false;
 
     public void incrementByThread1() {
-        synchronized (this) {
-            while (!t1){
-                try {
-                    wait();
-                } catch(InterruptedException ex){
-                    ex.printStackTrace();
+        while(true) {
+            synchronized (this) {
+                while (!t1 && (t2 || t3)) {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                    }
                 }
+                System.out.println(Thread.currentThread().getName() + ": " + i);
+                t1Count = i;
+                i++;
+                t1 = false;
+                t2 = true;
+                t3 = false;
+                this.notifyAll();
             }
-            System.out.println(Thread.currentThread().getName() + ": " + i);
-            t1Count = i;
-            i++;
-            t1 = false;
-            t2 = true;
-            notifyAll();
         }
     }
 
     public void incrementByThread2(){
-        synchronized (this){
-            while(!t2){
-                try{
-                    wait();
-                } catch(Exception ex){
-                    ex.printStackTrace();
+        while(true) {
+            synchronized (this) {
+                while (!t2 && (t1 || t3)) {
+                    try {
+                        this.wait();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
                 System.out.println(Thread.currentThread().getName() + ": " + i);
                 t2Count = i;
                 i++;
                 t2 = false;
                 t3 = true;
-                notifyAll();
+                t1 = false;
+                this.notifyAll();
             }
         }
     }
 
     public void productByThread3(){
-        synchronized (this){
-            while(!t3){
-                try{
-                    wait();
-                } catch(Exception ex){
-                    ex.printStackTrace();
+        while(true) {
+            synchronized (this) {
+                while (!t3 && (t1 || t2)) {
+                    try {
+                        this.wait();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
+                System.out.println(Thread.currentThread().getName() + ": " + (t1Count * t2Count));
+                t3 = false;
+                t1 = true;
+                t2 = false;
+                this.notifyAll();
             }
-            System.out.println(Thread.currentThread().getName() +": " + (t1Count * t2Count));
-            t3 = false;
-            t1 = true;
-            notifyAll();
         }
     }
 
     public static void main(String[] args){
         ThreeThreadSynchronization tts = new ThreeThreadSynchronization();
-        Thread thread1 = new Thread(new Runnable(){
-           @Override
-           public void run(){
-               tts.incrementByThread1();
-           }
-        });
+        Thread thread1 = new Thread(() -> tts.incrementByThread1());
 
-        Thread thread2 = new Thread(new Runnable(){
-           @Override
-           public void run(){
-               tts.incrementByThread2();
-           }
-        });
+        Thread thread2 = new Thread(() -> tts.incrementByThread2());
 
-        Thread thread3 = new Thread(new Runnable(){
-            @Override
-            public void run(){
-                tts.productByThread3();
-            }
-        });
+        Thread thread3 = new Thread(() -> tts.productByThread3());
 
         thread1.start();
         thread2.start();
