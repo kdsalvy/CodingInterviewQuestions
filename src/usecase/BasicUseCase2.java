@@ -20,11 +20,10 @@ public class BasicUseCase2 {
 
     public static void main(String[] args) {
         BasicUseCase2 pcp = new BasicUseCase2();
-        Producer producer = pcp.new Producer();
-        Consumer consumer = pcp.new Consumer();
-
         // create 10 producers and consumers
         for (int i = 0; i < 10; i++) {
+            Producer producer = pcp.new Producer();
+            Consumer consumer = pcp.new Consumer();
             Thread producerThread = new Thread(producer);
             Thread consumerThread = new Thread(consumer);
             producerThread.start();
@@ -44,9 +43,10 @@ public class BasicUseCase2 {
 
         @Override
         public void run() {
-            synchronized (_LOCK) {
-                while (true) {
+            while (true) {
+                synchronized (_LOCK) {
                     try {
+                        Thread.sleep(1000);
                         if (queue.size() < size) {
                             System.out.println(Thread.currentThread().getName() + " : Produced Packet: " + packet);
                             queue.offer(packet++);
@@ -69,10 +69,10 @@ public class BasicUseCase2 {
     public class Consumer implements Runnable {
         @Override
         public void run() {
-            synchronized (_LOCK) {
-                while (true) {
-                    try {
-                        //Thread.sleep(1000);
+            while (true) {
+                synchronized (_LOCK) {
+                   try {
+                        Thread.sleep(1000);
                         if (queue.size() > 0) {
                             System.out.println(Thread.currentThread().getName() + " : Consumed Packet: " + queue.poll());
                             _LOCK.notifyAll();
