@@ -7,7 +7,7 @@ import java.util.Stack;
 public class ValidParenthesisString {
 
     public static void main(String[] args){
-        String str = "(()(()))";
+        String str = "(()((()))";
         System.out.println(isValidString(str));
     }
 
@@ -24,13 +24,10 @@ public class ValidParenthesisString {
             char cur = str.charAt(i);
             if(charMap.keySet().contains(cur))
                 stack.push(cur);
-            else{
-                if(stack.isEmpty())
-                    return false;
-                if(charMap.values().contains(cur) && charMap.get(stack.peek()) == cur)
-                    stack.pop();
-                else
-                    return false;
+            else if(!stack.isEmpty() && charMap.values().contains(cur) && charMap.get(stack.peek()) == cur) {
+                stack.pop();
+            } else {
+                return false;
             }
         }
         if(stack.isEmpty())
