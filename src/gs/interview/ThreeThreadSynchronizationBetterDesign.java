@@ -1,6 +1,5 @@
 package gs.interview;
 
-import java.io.ObjectInputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -9,7 +8,6 @@ public class ThreeThreadSynchronizationBetterDesign {
 
     public static void main(String[] args){
 
-        final Object lock = new Object();
         final Semaphore s1 = new Semaphore(1);
         final Semaphore s2 = new Semaphore(0);
         final Semaphore s3 = new Semaphore(0);
